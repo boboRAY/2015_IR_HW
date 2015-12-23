@@ -2,6 +2,8 @@ from lib.porterStemmer import PorterStemmer
 import re
 import collections
 import math
+import heapq
+from pqdict import pqdict
 
 doc_number = 1095
 # read stop word
@@ -68,8 +70,6 @@ for term in raw_term_dict:
     term_idf = math.log10(float(doc_number)/float(df))
     term_dict[term] = {'df' : df , 'idf' : term_idf}
 
-C = Matrix = [[0 for x in range(1096)] for x in range(1096)]  
-
 doc_tfidf_dict = {}
 #cosine similarity
 def cosine(docid_x , docid_y):
@@ -81,7 +81,7 @@ def cosine(docid_x , docid_y):
         #if doc_y also has term with index, than multiple them
         if index in dict_y:
             inner_product_sum += vector * dict_y[index]
-    C[docid_x][docid_y] = inner_product_sum
+    return inner_product_sum
 
 print 'count tfidf'
 #for each doc do tf-idf
@@ -101,7 +101,37 @@ for i in range(1,doc_number+1):
         tfidf_dict[term] = tf_idf
     doc_tfidf_dict[i] = tfidf_dict
 
+P = {}
 print 'save similarity'
 for i in range(1,1096):
+    pq = pqdict({},reverse = True) 
     for j in range(1,1096):
-        cosine(i,j)
+        if i != j:
+            pq[j]=cosine(i,j)
+    P[i] = pq 
+
+A = []
+I = [1]*1096
+I[0] = 0
+
+print "clustering"
+for k in range(1,1095):
+    k2 = 0
+    k1 = 0
+    maxm = 0
+    for m in range(1,1096):
+        if I[m] != 0 and maxm < P[m].values()[0]:
+            maxm = P[m].values()[0]
+            k1 = m 
+            k2 =  P[m].keys()[0]
+    A.append([k1,k2])
+    print k1,k2
+    P[k1].pop(k2)
+    I[k2] = 0
+    for i in range(1,1096):
+        if I[i] == 1 and i != k1:
+            pq = P[i]
+            newscore = min(pq.pop(k1),pq.pop(k2))
+            pq[k1] = newscore
+            P[i] = pq
+    
