@@ -110,9 +110,23 @@ for i in range(1,1096):
             pq[j]=cosine(i,j)
     P[i] = pq 
 
-A = []
 I = [1]*1096
-I[0] = 0
+A = [[]]
+for i in range(1,1096):
+    A.append([i])
+#print result
+def print_result(k):
+    k = 1095-k
+    f = open(str(k)+".txt","w")
+    for vlist in A:
+        if len(vlist) > 0:
+            for t in vlist:
+                f.write(str(t))
+                f.write("\n")
+            f.write("\n")
+    f.close()
+    print str(k)+".txt has saved"
+            
 
 print "clustering"
 for k in range(1,1095):
@@ -124,7 +138,8 @@ for k in range(1,1095):
             maxm = P[m].values()[0]
             k1 = m 
             k2 =  P[m].keys()[0]
-    A.append([k1,k2])
+    A[k1] = A[k1]+A[k2]
+    A[k2] = []
     print k1,k2
     P[k1].pop(k2)
     I[k2] = 0
@@ -134,4 +149,6 @@ for k in range(1,1095):
             newscore = min(pq.pop(k1),pq.pop(k2))
             pq[k1] = newscore
             P[i] = pq
+    if k == 1095-8 or k == 1095-13 or k == 1095-20:
+        print_result(k)
     
