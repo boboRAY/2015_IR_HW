@@ -120,7 +120,7 @@ def print_result(k):
     f = open(str(k)+".txt","w")
     for vlist in A:
         if len(vlist) > 0:
-            for t in vlist:
+            for t in sorted(vlist):
                 f.write(str(t))
                 f.write("\n")
             f.write("\n")
@@ -151,4 +151,3 @@ for k in range(1,1095):
             P[i] = pq
     if k == 1095-8 or k == 1095-13 or k == 1095-20:
         print_result(k)
-    
